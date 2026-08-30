@@ -1,5 +1,7 @@
 # hako - multicall, userland util
 
+> 箱 (hako) - noun, suffix, counter - box; case; chest; package; pack; crate
+
 ```
 commands:
     watchfd - inspect file descriptors of a process in a refreshing view
