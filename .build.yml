@@ -1,0 +1,46 @@
+image: nixos/latest
+
+submitter:
+  git.sr.ht:
+    enabled: true
+    allow-refs:
+      - refs/heads/*
+      - "refs/tags/*"
+
+sources:
+  - https://git.sr.ht/~xqtc/hako
+
+secrets:
+  - 228a295b-93dc-4c7e-93a2-44d5b678859d
+
+environment:
+  NIX_CONFIG: experimental-features = nix-command flakes
+
+tasks:
+  - mirror: |
+      echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJlgithub.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=" >> ~/.ssh/known_hosts 2> /dev/null
+      echo "github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=" >> ~/.ssh/known_hosts 2> /dev/null
+      cd hako
+      git remote add github git@github.com:xqtc161/hako.git
+      git push --force github HEAD:trunk
+      git push --force --tags github HEAD:trunk
+
+  - build: |
+      cd hako
+      nix run .#build
+
+  - test: |
+      cd hako
+      nix run .#test
+
+  - lint: |
+      cd hako
+      url=$(curl -sL https://api.github.com/repos/rockorager/ziglint/releases/latest \
+        | grep browser_download_url \
+        | grep ziglint-x86_64-linux.tar.gz \
+        | head -1 \
+        | cut -d '"' -f 4)
+      curl -sL "$url" | tar xz
+      ./ziglint src
+
+
