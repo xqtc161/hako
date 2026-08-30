@@ -1,6 +1,10 @@
 const std = @import("std");
+const builtins = @import("builtin");
 
-const watchfd = @import("watchfd.zig");
+const watchfd = switch (builtins.os.tag) {
+    .linux => @import("watchfd.zig"),
+    else => @compileError("unsupported OS"),
+};
 const listen = @import("listen.zig");
 const pwait = @import("pwait.zig");
 const when = @import("when.zig");
@@ -39,6 +43,8 @@ pub fn main(init: std.process.Init) !void {
 
     const basename = std.Io.Dir.path.basename(args[0]);
 
+    const io = init.io;
+
     var inbuf: [1024]u8 = undefined;
     var inreader = std.Io.File.stdin().reader(init.io, &inbuf);
     const stdin = &inreader.interface;
@@ -51,14 +57,14 @@ pub fn main(init: std.process.Init) !void {
     switch (try Command.fromString(basename)) {
         .hako => {
             try printHako(stdout);
-            std.process.exit(0);
         },
-        .watchfd => {},
+        .watchfd => try watchfd.exec(io, args),
         .listen => {},
         .pwait => {},
         .when => {},
         .ports => {},
     }
+    return;
 }
 
 fn printHako(stdout: *std.Io.Writer) !void {
