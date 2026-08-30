@@ -2,7 +2,11 @@ const std = @import("std");
 const builtins = @import("builtin");
 
 const watchfd = switch (builtins.os.tag) {
-    .linux => @import("watchfd.zig"),
+    .linux => @import("watchfd.zig"), // ziglint-ignore: Z028
+    else => @compileError("unsupported OS"),
+};
+const dumpfd = switch (builtins.os.tag) {
+    .linux => @import("dumpfd.zig"), // ziglint-ignore: Z028
     else => @compileError("unsupported OS"),
 };
 const listen = @import("listen.zig");
@@ -14,6 +18,7 @@ const ansi = @import("ansi.zig");
 
 const Command = enum {
     watchfd,
+    dumpfd,
     listen,
     pwait,
     when,
@@ -23,6 +28,8 @@ const Command = enum {
     fn fromString(str: []const u8) !Command {
         if (std.mem.eql(u8, str, "watchfd"))
             return .watchfd;
+        if (std.mem.eql(u8, str, "dumpfd"))
+            return .dumpfd;
         if (std.mem.eql(u8, str, "listen"))
             return .listen;
         if (std.mem.eql(u8, str, "pwait"))
@@ -59,6 +66,7 @@ pub fn main(init: std.process.Init) !void {
             try printHako(stdout);
         },
         .watchfd => try watchfd.exec(io, args),
+        .dumpfd => try dumpfd.exec(io, args),
         .listen => {},
         .pwait => {},
         .when => {},
@@ -89,13 +97,19 @@ fn printHako(stdout: *std.Io.Writer) !void {
     });
 
     try stdout.print(
-        \\        {s}watchfd{s} - {s}inspect file descriptors of a process{s}
+        \\        {s}watchfd{s} - {s}inspect file descriptors of a process in a refreshing view{s}
+        \\        {s}dumpfd{s}  - {s}inspect a snapshot of file descriptors of a given process{s}
         \\        {s}listen{s}  - {s}tcp/unix sockets{s}
         \\        {s}pwait{s}   - {s}wait for a proc to disappear{s}
         \\        {s}when{s}    - {s}execute a command when a file/directory changes{s}
         \\        {s}ports{s}   - {s}print ports and the processes that listen on them{s}
         \\
     , .{
+        ansi.underline,
+        ansi.reset,
+        ansi.green,
+        ansi.reset,
+
         ansi.underline,
         ansi.reset,
         ansi.green,
