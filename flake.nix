@@ -3,6 +3,7 @@
 
   inputs = {
     zig2nix.url = "github:Cloudef/zig2nix";
+    nixpks.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
   };
 
   outputs =
@@ -34,6 +35,12 @@
 
           # Smaller binaries and avoids shipping glibc.
           zigPreferMusl = true;
+
+          postInstall = ''
+            for applet in watchfd dumpfd listen pwait when ports; do
+              ln -s hako "$out/bin/$applet"
+            done
+          '';
         };
 
         # nix build .
@@ -76,12 +83,12 @@
         devShells.default = env.mkShell {
           # Packages required for compiling, linking and running
           # Libraries added here will be automatically added to the LD_LIBRARY_PATH and PKG_CONFIG_PATH
-          nativeBuildInputs =
-            [ ]
-            ++ packages.default.nativeBuildInputs
-            ++ packages.default.buildInputs
-            ++ packages.default.zigWrapperBins
-            ++ packages.default.zigWrapperLibs;
+          nativeBuildInputs = [
+          ]
+          ++ packages.default.nativeBuildInputs
+          ++ packages.default.buildInputs
+          ++ packages.default.zigWrapperBins
+          ++ packages.default.zigWrapperLibs;
         };
       }
     ));
