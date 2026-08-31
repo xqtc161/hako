@@ -36,6 +36,10 @@
           # Smaller binaries and avoids shipping glibc.
           zigPreferMusl = true;
 
+          zigBuildFlags = [
+            "-Doptimize=ReleaseSmall"
+          ];
+
           postInstall = ''
             for applet in watchfd dumpfd listen pwait when ports; do
               ln -s hako "$out/bin/$applet"
