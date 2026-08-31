@@ -67,7 +67,7 @@ pub fn main(init: std.process.Init) !void {
         },
         .watchfd => try watchfd.exec(io, args),
         .dumpfd => try dumpfd.exec(io, args),
-        .listen => {},
+        .listen => try listen.exec(io, args),
         .pwait => {},
         .when => {},
         .ports => {},
