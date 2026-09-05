@@ -21,8 +21,27 @@ const Protocol = enum {
 };
 
 pub fn exec(io: std.Io, args: []const [:0]const u8) !void {
-    if (args.len < 2)
+    if (args.len < 2) {
+        std.debug.print(
+            \\{s}usage:{s} {s}listen{s} unix {s}<path>{s}
+            \\       {s}listen{s} tcp  {s}<address> <port>{s}
+            \\
+        ,
+            .{
+                ansi.red,
+                ansi.reset,
+                ansi.magenta,
+                ansi.reset,
+                ansi.yellow,
+                ansi.reset,
+                ansi.magenta,
+                ansi.reset,
+                ansi.yellow,
+                ansi.reset,
+            },
+        );
         return error.InvalidArguments;
+    }
 
     const protocol = try Protocol.fromString(args[1]);
 
@@ -34,4 +53,5 @@ pub fn exec(io: std.Io, args: []const [:0]const u8) !void {
 }
 
 const std = @import("std");
+const ansi = @import("../ansi.zig");
 const listen = @This();
