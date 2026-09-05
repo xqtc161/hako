@@ -99,7 +99,7 @@ fn printHako(stdout: *std.Io.Writer) !void {
     try stdout.print(
         \\        {s}watchfd{s} - {s}inspect file descriptors of a process in a refreshing view{s}
         \\        {s}dumpfd{s}  - {s}inspect a snapshot of file descriptors of a given process{s}
-        \\        {s}listen{s}  - {s}tcp/unix sockets{s}
+        \\        {s}listen{s}  - {s}listen on tcp/unix sockets and print what you receive{s}
         \\        {s}pwait{s}   - {s}wait for a proc to disappear{s}
         \\        {s}when{s}    - {s}execute a command when a file/directory changes{s}
         \\        {s}ports{s}   - {s}print ports and the processes that listen on them{s}

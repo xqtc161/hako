@@ -1,6 +1,7 @@
 const std = @import("std");
 const Io = std.Io;
 const util = @import("util.zig");
+const ansi = @import("../ansi.zig");
 
 pub fn exec(io: Io, args: []const [:0]const u8) !void {
     var server = blk: {
@@ -18,8 +19,8 @@ pub fn exec(io: Io, args: []const [:0]const u8) !void {
 fn argsFromSlice(io: Io, args: []const [:0]const u8) !Io.net.IpAddress {
     if (args.len < 2 or args.len != 4) {
         std.debug.print(
-            "usage: hako listen tcp <address> <port>\n",
-            .{},
+            "{s}usage:{s} {s}listen{s} tcp {s}<address> <port>{s}\n",
+            .{ ansi.red, ansi.reset, ansi.magenta, ansi.reset, ansi.yellow, ansi.reset },
         );
         return error.InvalidArguments;
     }
