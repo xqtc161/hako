@@ -9,7 +9,7 @@ const dumpfd = switch (builtins.os.tag) {
     .linux => @import("dumpfd.zig"), // ziglint-ignore: Z028
     else => @compileError("unsupported OS"),
 };
-const listen = @import("listen.zig");
+const listen = @import("listen/root.zig");
 const pwait = @import("pwait.zig");
 const when = @import("when.zig");
 const ports = @import("ports.zig");
