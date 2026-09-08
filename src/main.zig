@@ -1,21 +1,3 @@
-const std = @import("std");
-const builtins = @import("builtin");
-
-const watchfd = switch (builtins.os.tag) {
-    .linux => @import("watchfd.zig"), // ziglint-ignore: Z028
-    else => @compileError("unsupported OS"),
-};
-const dumpfd = switch (builtins.os.tag) {
-    .linux => @import("dumpfd.zig"), // ziglint-ignore: Z028
-    else => @compileError("unsupported OS"),
-};
-const listen = @import("listen/root.zig");
-const pwait = @import("pwait.zig");
-const when = @import("when.zig");
-const ports = @import("ports.zig");
-
-const ansi = @import("ansi.zig");
-
 const Command = enum {
     watchfd,
     dumpfd,
@@ -163,3 +145,21 @@ fn printHako(stdout: *std.Io.Writer) !void {
     });
     stdout.flush() catch return;
 }
+
+const watchfd = switch (builtins.os.tag) {
+    .linux => @import("watchfd.zig"), // ziglint-ignore: Z028
+    else => @compileError("unsupported OS"),
+};
+const dumpfd = switch (builtins.os.tag) {
+    .linux => @import("dumpfd.zig"), // ziglint-ignore: Z028
+    else => @compileError("unsupported OS"),
+};
+
+const std = @import("std");
+const builtins = @import("builtin");
+
+const ansi = @import("ansi.zig");
+const listen = @import("listen/root.zig");
+const ports = @import("ports.zig");
+const pwait = @import("pwait.zig");
+const when = @import("when.zig");

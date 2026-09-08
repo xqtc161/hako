@@ -1,6 +1,3 @@
-pub const unix = @import("unix.zig");
-pub const tcp = @import("tcp.zig");
-
 const Protocol = enum {
     tcp,
     unix,
@@ -52,6 +49,10 @@ pub fn exec(io: std.Io, args: []const [:0]const u8) !void {
     return;
 }
 
-const std = @import("std");
-const ansi = @import("../ansi.zig");
 const listen = @This();
+
+const std = @import("std");
+
+const ansi = @import("../ansi.zig");
+pub const tcp = @import("tcp.zig");
+pub const unix = @import("unix.zig");

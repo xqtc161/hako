@@ -80,9 +80,9 @@ fn getProcFd(io: std.Io, pid: posix.pid_t) !void {
 }
 
 const std = @import("std");
-const builtin = @import("builtin");
 const Io = std.Io;
-const ansi = @import("ansi.zig");
-
 const posix = std.posix;
 const linux = std.os.linux;
+const builtin = @import("builtin");
+
+const ansi = @import("ansi.zig");

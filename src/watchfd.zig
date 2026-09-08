@@ -224,9 +224,9 @@ fn drawProcFd(io: Io, pid: posix.pid_t, stdout: *std.Io.Writer) !void {
 }
 
 const std = @import("std");
-const builtin = @import("builtin");
 const Io = std.Io;
-const ansi = @import("ansi.zig");
-
 const posix = std.posix;
 const linux = std.os.linux;
+const builtin = @import("builtin");
+
+const ansi = @import("ansi.zig");

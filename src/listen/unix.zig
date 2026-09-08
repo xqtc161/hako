@@ -1,8 +1,3 @@
-const std = @import("std");
-const Io = std.Io;
-const util = @import("util.zig");
-const ansi = @import("../ansi.zig");
-
 pub fn exec(io: Io, args: []const [:0]const u8) !void {
     if (args.len < 2 or args.len != 3) {
         std.debug.print(
@@ -32,3 +27,9 @@ pub fn exec(io: Io, args: []const [:0]const u8) !void {
     }
     try util.redir(io, &server);
 }
+
+const std = @import("std");
+const Io = std.Io;
+
+const ansi = @import("../ansi.zig");
+const util = @import("util.zig");
