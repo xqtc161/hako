@@ -1,10 +1,15 @@
-const std = @import("std");
-const Io = std.Io;
-const ansi = @import("ansi.zig");
-const linux = std.os.linux;
-const posix = std.posix;
-
+// TODO: parse events, handle CREATE | MOVED_TO + ISDIR with new watchers
 pub fn exec(io: Io, args: []const [:0]const u8) !void {
+    const path, const cmd = blk: {
+        if (args.len < 4)
+            return error.MissingArgs;
+
+        if (!std.mem.eql(u8, args[2], "--"))
+            return error.MissingCommand;
+
+        break :blk .{ args[1], args[3..] };
+    };
+
     const r = linux.inotify_init1(linux.IN.CLOEXEC);
     if (linux.errno(r) != .SUCCESS)
         return error.InotifyInit;
@@ -12,25 +17,29 @@ pub fn exec(io: Io, args: []const [:0]const u8) !void {
     const fd: std.posix.fd_t = @intCast(r);
     defer _ = linux.close(fd);
 
+    const mask = linux.IN.CLOSE_WRITE |
+        linux.IN.CREATE |
+        linux.IN.DELETE |
+        linux.IN.MOVED_FROM |
+        linux.IN.MOVED_TO;
+
+    // TODO: recurse subdirs
     const wd = linux.inotify_add_watch(
         @intCast(fd),
-        args[1],
-        linux.IN.MODIFY,
+        path,
+        mask,
     );
     if (linux.errno(wd) != .SUCCESS)
         return error.InotifyAddWatchError;
 
-    const cmd = blk: {
-        if (std.mem.eql(u8, args[2], "--") and args.len >= 3)
-            break :blk args[3..];
-        return error.MissingCommand;
-    };
-
     var child: ?std.process.Child = null;
+    defer child.?.kill(io);
 
     var pollfds = [_]posix.pollfd{.{ .fd = fd, .events = posix.POLL.IN, .revents = 0 }};
 
     var pending = false;
+
+    const debounce_ms = 50;
 
     var event: [4 * 1024]u8 = undefined;
     while (true) {
@@ -38,7 +47,7 @@ pub fn exec(io: Io, args: []const [:0]const u8) !void {
 
         const ready = try posix.poll(
             &pollfds,
-            if (pending) 10 else -1,
+            if (pending) debounce_ms else -1,
         );
 
         if (ready == 0) {
@@ -61,10 +70,6 @@ pub fn exec(io: Io, args: []const [:0]const u8) !void {
 
             pending = true;
         }
-
-        // var buf: [128]u8 = undefined;
-        // const event_parsed = inotifyEventName(nb, &buf);
-        // std.debug.print("{s}[*] {s}{s}\n", .{ ansi.green ++ ansi.dim, event_parsed, ansi.reset });
     }
 }
 
@@ -114,3 +119,10 @@ fn inotifyEventName(mask: usize, buf: []u8) []const u8 {
     if (!any) return "0";
     return buf[0..w.end];
 }
+
+const std = @import("std");
+const Io = std.Io;
+const linux = std.os.linux;
+const posix = std.posix;
+
+const ansi = @import("ansi.zig");
