@@ -34,11 +34,6 @@ pub fn main(init: std.process.Init) !void {
 
     const io = init.io;
 
-    var inbuf: [1024]u8 = undefined;
-    var inreader = std.Io.File.stdin().reader(init.io, &inbuf);
-    const stdin = &inreader.interface;
-    _ = stdin; // autofix
-
     var outbuf: [1024]u8 = undefined;
     var outreader = std.Io.File.stdout().writer(init.io, &outbuf);
     const stdout = &outreader.interface;
